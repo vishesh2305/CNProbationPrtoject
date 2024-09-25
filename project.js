@@ -224,6 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (agendaTime <= presentDate) {
                 // If the current time is past the agenda time, change the background color
                 agenda.style.backgroundColor = '#B4FF47';
+                agenda.style.color = "#ffffff"
             }
         });
     }
