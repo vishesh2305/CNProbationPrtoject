@@ -1,64 +1,45 @@
+let countdownDate = new Date('2024-09-21T00:00:00');  // Default countdown date
+
 document.addEventListener("DOMContentLoaded", () => {
-    const dayscount = document.getElementById("days")
-    const hourscount = document.getElementById("hours")
-    const minutescount = document.getElementById("minutes")
-    const secondcount = document.getElementById("seconds")
-    const countdownDate = new Date('2024-09-21T00:00:00');
+    // Listener for messages from the admin panel
+    window.addEventListener('message', (event) => {
+        if (event.data.type === 'updateCountdown') {
+            countdownDate = new Date(event.data.dateTime);  // Update countdownDate when a new date is received
+            console.log('New countdown date received:', countdownDate);  // Log the new countdown date
+        }
+    });
 
-
-// Function for functioning of Countdown:::::
-// When the Countdown is Complete then the Countdown will show the Current time Whatever time is there
+    // Function to update the countdown display
     function Countdown() {
-        const presentdate = new Date();
-        const timeleft = countdownDate - presentdate;
-        const days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const  minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
-        const  seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
+        const presentDate = new Date();  // Get the current date and time
+        const timeLeft = countdownDate.getTime() - presentDate.getTime();  // Calculate the time left in milliseconds
 
-        if (timeleft <= 0) {
-            // Countdown has completed, display current time
-            const currentTime = presentdate.toLocaleTimeString();
-            dayscount.textContent = currentTime;
-            hourscount.textContent = "";
-            minutescount.textContent = "";
-            secondcount.textContent = "";
-            document.querySelectorAll(".coluns-countdown").forEach(element => element.style.display = "none");
-            
+        // Log the present date, countdown date, and time left for debugging
+        console.log('Countdown Date:', countdownDate);
+        console.log('Current Date:', presentDate);
+        console.log('Time left in ms:', timeLeft);
 
-
-
+        if (timeLeft <= 0) {
+            // Countdown finished or date passed
+            document.getElementById('days').textContent = "Event Over";
+            document.getElementById('hours').textContent = "";
+            document.getElementById('minutes').textContent = "";
+            document.getElementById('seconds').textContent = "";
+            document.querySelectorAll('.coluns-countdown').forEach(element => element.style.display = 'none');
         } else {
-            dayscount.textContent = days;
-            hourscount.textContent = hours;
-            minutescount.textContent = minutes;
-            secondcount.textContent = seconds;
+            // Otherwise, calculate and display the remaining time
+            const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+            // Update the HTML with the time remaining
+            document.getElementById('days').textContent = days;
+            document.getElementById('hours').textContent = hours;
+            document.getElementById('minutes').textContent = minutes;
+            document.getElementById('seconds').textContent = seconds;
         }
     }
 
-    setInterval(Countdown, 1000);
-
-
-
-    function updateAgenda() {
-        const agendas = document.getElementsByClassName("agendas-title");
-        const currentTime = new Date().getHours() + ":" + new Date().getMinutes();
-    
-        for (let agenda = 0; agenda < agendas.length; agenda++) {
-            const agendaTime = agendas[agenda].getAttribute("data-time");
-            if (currentTime >= agendaTime) {
-                agendas[agenda].style.backgroundColor = "rgb(71, 188, 71)";
-                agendas[agenda].style.color = "white"
-            } else {
-                agendas[agenda].style.backgroundColor = "";
-            }
-        }
-    }
-
-
-    setInterval(updateAgenda, 1000);
-
-
-
-
-})
+    setInterval(Countdown, 1000);  // Run the countdown every second
+});
